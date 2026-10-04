@@ -6,7 +6,31 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # --- API Keys ---
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
+OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")
+OPENROUTER_EMBEDDING_MODEL = os.getenv(
+    "OPENROUTER_EMBEDDING_MODEL", "openai/text-embedding-3-small"
+)
+OPENROUTER_APP_NAME = os.getenv("OPENROUTER_APP_NAME", "Production RAG")
+OPENROUTER_APP_URL = os.getenv("OPENROUTER_APP_URL", "")
+
+
+def create_openrouter_client():
+    """Create an OpenAI SDK client pointed at the OpenRouter-compatible API."""
+    if not OPENROUTER_API_KEY:
+        raise RuntimeError("Set OPENROUTER_API_KEY in your .env file first")
+
+    from openai import OpenAI
+
+    headers = {"X-OpenRouter-Title": OPENROUTER_APP_NAME}
+    if OPENROUTER_APP_URL:
+        headers["HTTP-Referer"] = OPENROUTER_APP_URL
+    return OpenAI(
+        api_key=OPENROUTER_API_KEY,
+        base_url=OPENROUTER_BASE_URL,
+        default_headers=headers,
+    )
 
 # --- Qdrant ---
 QDRANT_HOST = "localhost"
